@@ -21,6 +21,12 @@ class NetworkBehavior(nn.Module):
         raise NotImplementedError()
 
     def init_settings(self, is_training):
+        # Enable cuDNN benchmarking to select optimal algorithms for current shapes
+        try:
+            import torch
+            torch.backends.cudnn.benchmark = True
+        except Exception:
+            pass
         if(self.use_gpu):
             self.cuda()
         else:
@@ -49,7 +55,7 @@ class NetworkBehavior(nn.Module):
 
 class NetworkInterface:
 
-    def __init__(self, net, save_name, load_checkpoint=False, load_path='cache_data'):
+    def __init__(self, net, save_name, load_checkpoint=False, load_path='cache_data', inference_only=False):
         self.net=net
         if(not isinstance(self.net,NetworkBehavior)):
             raise Exception('Invalid network type')
@@ -60,7 +66,7 @@ class NetworkInterface:
         save_path=os.path.join(WORKING_PATH,load_path,'%s.sdict'%save_name)
         cp_save_path=os.path.join(WORKING_PATH,load_path,'%s.cp.sdict'%save_name)
         self.finalized=False
-        self.optimizer=self.net.get_optimizer()
+        self.optimizer=None if inference_only else self.net.get_optimizer()
         self.counter=0
         self.best_val_loss=np.inf
         self.best_epoch_dist=0
@@ -74,7 +80,8 @@ class NetworkInterface:
             # self.net.load_state_dict(new_state_dict)
             self.net.load_state_dict(state_dict['net'])
             self.counter=state_dict['counter']
-            self.optimizer.load_state_dict(state_dict['opt'])
+            if(not inference_only and 'opt' in state_dict and self.optimizer is not None):
+                self.optimizer.load_state_dict(state_dict['opt'])
             try:
                 self.best_epoch_dist=state_dict['best_epoch_dist']
                 self.best_val_loss=state_dict['best_val_loss']
@@ -91,7 +98,8 @@ class NetworkInterface:
             # self.net.load_state_dict(new_state_dict)
             self.net.load_state_dict(state_dict['net'])
             self.counter=state_dict['counter']
-            self.optimizer.load_state_dict(state_dict['opt'])
+            if(not inference_only and 'opt' in state_dict and self.optimizer is not None):
+                self.optimizer.load_state_dict(state_dict['opt'])
             try:
                 self.best_epoch_dist=state_dict['best_epoch_dist']
                 self.best_val_loss=state_dict['best_val_loss']
@@ -303,20 +311,33 @@ class NetworkInterface:
 
     def inference(self, *args,**kwargs):
         self.net.init_settings(False)
-        inputs=[torch.tensor(arg,dtype=torch.float if arg.dtype in [np.float16,np.float32,np.float64] else torch.long)
-                for arg in args]
-        if(self.net.use_gpu):
-            inputs=[input.cuda() for input in inputs]
+        prepared_inputs=[]
+        for arg in args:
+            if isinstance(arg, torch.Tensor):
+                tensor_arg = arg
+            else:
+                # numpy or array-like
+                dtype = torch.float if hasattr(arg, 'dtype') and arg.dtype in [np.float16,np.float32,np.float64] else torch.long
+                tensor_arg = torch.tensor(arg, dtype=dtype)
+            if self.net.use_gpu and not tensor_arg.is_cuda:
+                tensor_arg = tensor_arg.cuda()
+            prepared_inputs.append(tensor_arg)
         with torch.no_grad():
-            return self.net.inference(*inputs,**kwargs)
+            return self.net.inference(*prepared_inputs,**kwargs)
 
     def inference_function(self,function,*args,**kwargs):
         self.net.init_settings(False)
-        inputs=[torch.tensor(arg,dtype=torch.float if arg.dtype in [np.float16,np.float32,np.float64] else torch.long)
-                for arg in args]
-        if(self.net.use_gpu):
-            inputs=[input.cuda() for input in inputs]
+        prepared_inputs=[]
+        for arg in args:
+            if isinstance(arg, torch.Tensor):
+                tensor_arg = arg
+            else:
+                dtype = torch.float if hasattr(arg, 'dtype') and arg.dtype in [np.float16,np.float32,np.float64] else torch.long
+                tensor_arg = torch.tensor(arg, dtype=dtype)
+            if self.net.use_gpu and not tensor_arg.is_cuda:
+                tensor_arg = tensor_arg.cuda()
+            prepared_inputs.append(tensor_arg)
         with torch.no_grad():
-            return self.net.__class__.__dict__[function](self.net,*inputs,**kwargs)
+            return self.net.__class__.__dict__[function](self.net,*prepared_inputs,**kwargs)
 
 

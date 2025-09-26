@@ -179,12 +179,13 @@ class ChordNet(NetworkBehavior):
     def inference(self, x):
         seq_length=x.shape[0]
         output=self.feed(x[:,SHIFT_HIGH*SHIFT_STEP:SHIFT_HIGH*SHIFT_STEP+SPEC_DIM].view((1,seq_length,SPEC_DIM)))
-        result_triad=F.softmax(output[0],dim=1).cpu().numpy()
-        result_bass=F.softmax(output[1],dim=1).cpu().numpy()
-        result_7=F.softmax(output[2],dim=1).cpu().numpy()
-        result_9=F.softmax(output[3],dim=1).cpu().numpy()
-        result_11=F.softmax(output[4],dim=1).cpu().numpy()
-        result_13=F.softmax(output[5],dim=1).cpu().numpy()
+        # Use log-softmax to produce log-probabilities for faster HMM decoding
+        result_triad=F.log_softmax(output[0],dim=1).cpu().numpy()
+        result_bass=F.log_softmax(output[1],dim=1).cpu().numpy()
+        result_7=F.log_softmax(output[2],dim=1).cpu().numpy()
+        result_9=F.log_softmax(output[3],dim=1).cpu().numpy()
+        result_11=F.log_softmax(output[4],dim=1).cpu().numpy()
+        result_13=F.log_softmax(output[5],dim=1).cpu().numpy()
         return result_triad,result_bass,result_7,result_9,result_11,result_13
 
 class ChordNetCNN(NetworkBehavior):
@@ -235,12 +236,13 @@ class ChordNetCNN(NetworkBehavior):
     def inference(self, x):
         seq_length=x.shape[0]
         output=self.feed(x[:,SHIFT_HIGH*SHIFT_STEP:SHIFT_HIGH*SHIFT_STEP+SPEC_DIM].view((1,seq_length,SPEC_DIM)))
-        result_triad=F.softmax(output[0],dim=1).cpu().numpy()
-        result_bass=F.softmax(output[1],dim=1).cpu().numpy()
-        result_7=F.softmax(output[2],dim=1).cpu().numpy()
-        result_9=F.softmax(output[3],dim=1).cpu().numpy()
-        result_11=F.softmax(output[4],dim=1).cpu().numpy()
-        result_13=F.softmax(output[5],dim=1).cpu().numpy()
+        # Use log-softmax to produce log-probabilities for faster HMM decoding
+        result_triad=F.log_softmax(output[0],dim=1).cpu().numpy()
+        result_bass=F.log_softmax(output[1],dim=1).cpu().numpy()
+        result_7=F.log_softmax(output[2],dim=1).cpu().numpy()
+        result_9=F.log_softmax(output[3],dim=1).cpu().numpy()
+        result_11=F.log_softmax(output[4],dim=1).cpu().numpy()
+        result_13=F.log_softmax(output[5],dim=1).cpu().numpy()
         return result_triad,result_bass,result_7,result_9,result_11,result_13
 
 class FocalLoss(nn.Module):
