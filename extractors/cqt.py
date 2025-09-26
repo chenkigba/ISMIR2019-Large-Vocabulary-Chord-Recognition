@@ -19,7 +19,8 @@ class NoteLevelCQT(ExtractorBase):
                                 fmin=librosa.note_to_hz('F#0'),
                                 n_bins=96,
                                 tuning=None,
-                                hop_length=entry.prop.hop_length).T
+                                hop_length=entry.prop.hop_length
+                                ).T
         return abs(result).astype(np.float32)
 
 class CQT(ExtractorBase):
