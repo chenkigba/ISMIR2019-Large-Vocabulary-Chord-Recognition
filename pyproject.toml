@@ -50,8 +50,11 @@ Repository = "https://github.com/your-username/ISMIR2019-Large-Vocabulary-Chord-
 chord-recognition = "chord_recognition:main"
 
 [tool.setuptools]
-packages = ["mir", "extractors", "io_new"]
+packages = ["LVCR_ismir2019", "LVCR_ismir2019.mir", "LVCR_ismir2019.extractors", "LVCR_ismir2019.io_new"]
 include-package-data = true
+
+[tool.setuptools.package-dir]
+"LVCR_ismir2019" = "."
 
 [tool.setuptools.package-data]
 "*" = ["data/*.txt", "data/*.csv", "data/*.lab", "data/*.n3", "data/*.svl", "data/*.pkl", "data/*.xlsx"]
