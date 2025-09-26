@@ -1,4 +1,5 @@
 import numpy as np
+import os
 
 try:
     # Try relative import when used as part of the package
@@ -29,6 +30,12 @@ class XHMMDecoder:
         self.__init_known_chord_names(template_file)
 
     def __init_known_chord_names(self, template_file):
+        # Resolve relative template path against package root if needed
+        if not os.path.isabs(template_file) and not os.path.exists(template_file):
+            pkg_root = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
+            candidate = os.path.join(pkg_root, template_file)
+            if os.path.exists(candidate):
+                template_file = candidate
         known_chord_array_pool = {}
         known_triad_bass = set()
         f = open(template_file, "r")

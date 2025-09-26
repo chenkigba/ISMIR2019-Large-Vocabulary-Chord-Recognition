@@ -12,7 +12,7 @@ pip install git+https://github.com/your-username/ISMIR2019-Large-Vocabulary-Chor
 pip install git+https://github.com/your-username/ISMIR2019-Large-Vocabulary-Chord-Recognition.git@main
 
 # Install in development mode (editable install)
-pip install -e git+https://github.com/your-username/ISMIR2019-Large-Vocabulary-Chord-Recognition.git#egg=chord-recognition-ismir2019
+pip install -e git+https://github.com/your-username/ISMIR2019-Large-Vocabulary-Chord-Recognition.git#egg=LVCR_ismir2019
 ```
 
 ## Usage
@@ -31,17 +31,17 @@ chord-recognition input_audio.mp3 output_chords.lab submission
 You can also use the package in your Python code:
 
 ```python
-import chord_recognition_ismir2019
+import LVCR_ismir2019
 
 # Using the main function
-chord_recognition_ismir2019.chord_recognition_main(
+LVCR_ismir2019.chord_recognition_main(
     "input_audio.mp3", 
     "output_chords.lab", 
     "submission"
 )
 
 # Or import specific modules
-from chord_recognition_ismir2019 import mir, extractors, io_new
+from LVCR_ismir2019 import mir, extractors, io_new
 ```
 
 ## Requirements

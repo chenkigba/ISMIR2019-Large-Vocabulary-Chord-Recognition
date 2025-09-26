@@ -21,6 +21,8 @@ import sys
 import os
 import torch
 
+PKG_DIR = os.path.dirname(os.path.abspath(__file__))
+
 MODEL_NAMES = [
     "joint_chord_net_ismir_naive_v1.0_reweight(0.0,10.0)_s%d.best" % i for i in range(5)
 ]
@@ -28,9 +30,11 @@ MODEL_NAMES = [
 
 def chord_recognition(audio_path, lab_path, chord_dict_name="submission"):
     # Use log-prob decoding; disable caching (one-off processing)
-    hmm = XHMMDecoder(
-        template_file="data/%s_chord_list.txt" % chord_dict_name, log_input=True
-    )
+    template_path = os.path.join(PKG_DIR, "data", f"{chord_dict_name}_chord_list.txt")
+    if not os.path.exists(template_path):
+        # fallback to full list if specific dict not found
+        template_path = os.path.join(PKG_DIR, "data", "full_chord_list.txt")
+    hmm = XHMMDecoder(template_file=template_path, log_input=True)
     # Empty name disables all extractors' cache
     entry = DataEntry()
     entry.prop.set("sr", DEFAULT_SR)
@@ -43,9 +47,14 @@ def chord_recognition(audio_path, lab_path, chord_dict_name="submission"):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     x_input = torch.tensor(cqt_np, dtype=torch.float32, device=device)
     probs = []
+    model_dir = os.path.join(PKG_DIR, "cache_data")
     for model_name in MODEL_NAMES:
         net = NetworkInterface(
-            ChordNet(None), model_name, load_checkpoint=False, inference_only=True
+            ChordNet(None),
+            model_name,
+            load_checkpoint=False,
+            load_path=model_dir,
+            inference_only=True,
         )
         print("Inference: %s on %s" % (model_name, audio_path))
         probs.append(net.inference(x_input))

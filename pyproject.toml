@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -38,7 +38,7 @@ dependencies = [
     "jams>=0.3.4",
     "numpy>=1.19.2",
     "pumpp>=0.5.0",
-    "scikit_learn>=0.23.2",
+    "scikit-learn>=0.23.2",
 ]
 
 [project.urls]
@@ -47,10 +47,10 @@ Repository = "https://github.com/your-username/ISMIR2019-Large-Vocabulary-Chord-
 "Bug Tracker" = "https://github.com/your-username/ISMIR2019-Large-Vocabulary-Chord-Recognition/issues"
 
 [project.scripts]
-chord-recognition = "chord_recognition:main"
+chord-recognition = "LVCR_ismir2019.chord_recognition:main"
 
 [tool.setuptools]
-packages = ["LVCR_ismir2019", "LVCR_ismir2019.mir", "LVCR_ismir2019.extractors", "LVCR_ismir2019.io_new"]
+packages = ["LVCR_ismir2019", "LVCR_ismir2019.mir", "LVCR_ismir2019.extractors", "LVCR_ismir2019.io_new", "mir", "extractors", "io_new"]
 include-package-data = true
 
 [tool.setuptools.package-dir]
@@ -70,5 +70,3 @@ include-package-data = true
     "data/*.xlsx",
     "cache_data/*.sdict"
 ]
-
-

@@ -6,3 +6,7 @@
 /.venv
 /spike
 AGENTS.md
+dist/
+build/
+*.egg-info/
+.eggs/
