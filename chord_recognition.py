@@ -1,11 +1,22 @@
-from chordnet_ismir_naive import ChordNet, chord_limit, ChordNetCNN
-from mir.nn.train import NetworkInterface
-from extractors.cqt import CQTV2, SimpleChordToID
-from mir import io, DataEntry
-from extractors.xhmm_ismir import XHMMDecoder
+try:
+    # Try relative import when used as part of the package
+    from .chordnet_ismir_naive import ChordNet, chord_limit, ChordNetCNN
+    from .mir.nn.train import NetworkInterface
+    from .extractors.cqt import CQTV2, SimpleChordToID
+    from .mir import io, DataEntry
+    from .extractors.xhmm_ismir import XHMMDecoder
+    from .io_new.chordlab_io import ChordLabIO
+    from .settings import DEFAULT_SR, DEFAULT_HOP_LENGTH
+except ImportError:
+    # Fall back to absolute import for standalone usage
+    from chordnet_ismir_naive import ChordNet, chord_limit, ChordNetCNN
+    from mir.nn.train import NetworkInterface
+    from extractors.cqt import CQTV2, SimpleChordToID
+    from mir import io, DataEntry
+    from extractors.xhmm_ismir import XHMMDecoder
+    from io_new.chordlab_io import ChordLabIO
+    from settings import DEFAULT_SR, DEFAULT_HOP_LENGTH
 import numpy as np
-from io_new.chordlab_io import ChordLabIO
-from settings import DEFAULT_SR, DEFAULT_HOP_LENGTH
 import sys
 import os
 import torch
