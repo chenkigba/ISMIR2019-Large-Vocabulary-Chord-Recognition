@@ -3,7 +3,7 @@ requires = ["setuptools>=45", "wheel", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chord-recognition-ismir2019"
+name = "LVCR_ismir2019"
 version = "1.0.0"
 description = "Large-Vocabulary Chord Transcription via Chord Structure Decomposition"
 readme = "README.MD"
