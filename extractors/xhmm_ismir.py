@@ -1,5 +1,11 @@
 import numpy as np
-from complex_chord import shift_complex_chord_array, Chord, NUM_TO_ABS_SCALE
+
+try:
+    # Try relative import when used as part of the package
+    from ..complex_chord import shift_complex_chord_array, Chord, NUM_TO_ABS_SCALE
+except ImportError:
+    # Fall back to absolute import for standalone usage
+    from complex_chord import shift_complex_chord_array, Chord, NUM_TO_ABS_SCALE
 
 
 class XHMMDecoder:
@@ -84,7 +90,9 @@ class XHMMDecoder:
         bass_collect = result_array[:, 1] >= 0
         if self.use_bass:
             if self.log_input:
-                result_logprob[:, bass_collect] += prob_bass[:, result_array[bass_collect, 1]]
+                result_logprob[:, bass_collect] += prob_bass[
+                    :, result_array[bass_collect, 1]
+                ]
             else:
                 result_logprob[:, bass_collect] += np.log(
                     prob_bass[:, result_array[bass_collect, 1]]
@@ -96,13 +104,11 @@ class XHMMDecoder:
                 roots = (result_array[:, 0] - 1) % 12
                 if len(suffix_probs[i].shape) == 3:
                     if self.log_input:
-                        result_logprob[:, suffix_collect] += (
-                            suffix_probs[i][
-                                :,
-                                roots[suffix_collect],
-                                result_array[suffix_collect, i + 2],
-                            ]
-                        )
+                        result_logprob[:, suffix_collect] += suffix_probs[i][
+                            :,
+                            roots[suffix_collect],
+                            result_array[suffix_collect, i + 2],
+                        ]
                     else:
                         result_logprob[:, suffix_collect] += np.log(
                             suffix_probs[i][
@@ -113,9 +119,9 @@ class XHMMDecoder:
                         )
                 else:
                     if self.log_input:
-                        result_logprob[:, suffix_collect] += (
-                            suffix_probs[i][:, result_array[suffix_collect, i + 2]]
-                        )
+                        result_logprob[:, suffix_collect] += suffix_probs[i][
+                            :, result_array[suffix_collect, i + 2]
+                        ]
                     else:
                         result_logprob[:, suffix_collect] += np.log(
                             suffix_probs[i][:, result_array[suffix_collect, i + 2]]
@@ -153,7 +159,9 @@ class XHMMDecoder:
             result_logprob = np.log(prob_triad[:, result_array[:, 0]])
         bass_collect = result_array[:, 1] >= 0
         if self.log_input:
-            result_logprob[:, bass_collect] += prob_bass[:, result_array[bass_collect, 1]]
+            result_logprob[:, bass_collect] += prob_bass[
+                :, result_array[bass_collect, 1]
+            ]
         else:
             result_logprob[:, bass_collect] += np.log(
                 prob_bass[:, result_array[bass_collect, 1]]

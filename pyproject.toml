@@ -55,7 +55,20 @@ include-package-data = true
 
 [tool.setuptools.package-dir]
 "LVCR_ismir2019" = "."
+"LVCR_ismir2019.mir" = "mir"
+"LVCR_ismir2019.extractors" = "extractors"
+"LVCR_ismir2019.io_new" = "io_new"
 
 [tool.setuptools.package-data]
-"*" = ["data/*.txt", "data/*.csv", "data/*.lab", "data/*.n3", "data/*.svl", "data/*.pkl", "data/*.xlsx"]
-"cache_data" = ["*.sdict"]
+"LVCR_ismir2019" = [
+    "data/*.txt",
+    "data/*.csv",
+    "data/*.lab",
+    "data/*.n3",
+    "data/*.svl",
+    "data/*.pkl",
+    "data/*.xlsx",
+    "cache_data/*.sdict"
+]
+
+
