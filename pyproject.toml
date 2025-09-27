@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "LVCR_ismir2019"
+name = "lvcr-ismir2019"
 version = "1.0.0"
 description = "Large-Vocabulary Chord Transcription via Chord Structure Decomposition"
 readme = "README.MD"
@@ -46,10 +46,10 @@ Repository = "https://github.com/username/ISMIR2019-Large-Vocabulary-Chord-Recog
 "Bug Tracker" = "https://github.com/username/ISMIR2019-Large-Vocabulary-Chord-Recognition/issues"
 
 [project.scripts]
-chord-recognition = "chord_recognition:main"
+chord-recognition = "lvcr_ismir2019.chord_recognition:main"
 
 [tool.setuptools.packages.find]
-include = ["mir*", "extractors*", "io_new*"]
+include = ["lvcr_ismir2019*"]
 
 [tool.setuptools.package-data]
-"*" = ["data/*", "cache_data/*"]
+lvcr_ismir2019 = ["data/*", "cache_data/*"]
