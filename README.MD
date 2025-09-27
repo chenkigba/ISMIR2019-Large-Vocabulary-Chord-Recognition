@@ -20,7 +20,6 @@ python3 chord_recognition.py path_to_audio_file path_to_output_file [chord_dict]
 ```
 
 For example,
-
 ```
 python3 chord_recognition.py example.mp3 example_chord.lab
 ```
