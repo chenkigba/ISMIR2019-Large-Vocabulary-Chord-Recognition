@@ -3,7 +3,7 @@ import torch.nn.functional as F
 import torch
 import torch.optim as optim
 from torch.utils.data import DataLoader
-from .common import WORKING_PATH
+from ..common import WORKING_PATH
 import os
 import numpy as np
 

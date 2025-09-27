@@ -309,11 +309,10 @@ if __name__ == '__main__':
     x=[[0,1,0,0,0,0],[12,0,0,0,0,0],[13,-1,2,0,0,0],[1,11,0,1,0,1]]
     print(shift_complex_chord_array_list(x,2))
     with open(get_resource_path('data', 'full_chord_list.txt'), 'r') as f:
-    test_chord_names=f.readlines()
+        test_chord_names=f.readlines()
     limit=ChordTypeLimit(triad_limit=3,seventh_limit=2,ninth_limit=1,eleventh_limit=1,thirteenth_limit=1)
     for chord_name in test_chord_names:
         chord_name=chord_name.strip()
         if(chord_name!=''):
             c=Chord(chord_name)
             print(chord_name,c.to_numpy())
-    f.close()

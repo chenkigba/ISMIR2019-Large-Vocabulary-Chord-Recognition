@@ -1,7 +1,9 @@
 import numpy as np
-from . import get_resource_path
+from pathlib import Path
 
-with open(get_resource_path('data', 'all_1217.csv'), 'r') as f:
+# Use relative path instead of get_resource_path to avoid circular import
+_data_path = Path(__file__).parent / 'data' / 'all_1217.csv'
+with open(_data_path, 'r') as f:
     lines=[line.strip() for line in f.readlines()]
 names={line:i for i,line in enumerate(lines)}
 total_songs=len(names)
@@ -11,7 +13,8 @@ TEST_IDS=[]
 TEST_FOLD_LOOKUP_TABLE={}
 np.random.seed(20190326)
 for fold in range(5):
-    with open(get_resource_path('data', f'train{fold:02d}.csv'), 'r') as f:
+    train_path = Path(__file__).parent / 'data' / f'train{fold:02d}.csv'
+    with open(train_path, 'r') as f:
         result=[names[line.strip()] for line in f.readlines()]
     result_length=len(result)
     val_set_count=result_length//4
@@ -19,7 +22,8 @@ for fold in range(5):
     result=[result[i] for i in perm]
     TRAIN_IDS.append(result[:-val_set_count])
     VAL_IDS.append(result[-val_set_count:])
-    with open(get_resource_path('data', f'test{fold:02d}.csv'), 'r') as f:
+    test_path = Path(__file__).parent / 'data' / f'test{fold:02d}.csv'
+    with open(test_path, 'r') as f:
         data=[line.strip() for line in f.readlines()]
     TEST_IDS.append([names[i] for i in data])
     for name in data:

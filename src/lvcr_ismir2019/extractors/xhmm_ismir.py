@@ -2,7 +2,7 @@ import numpy as np
 from pathlib import Path
 
 from ..complex_chord import shift_complex_chord_array, Chord, NUM_TO_ABS_SCALE
-from .. import get_resource_path
+# Removed get_resource_path import to avoid circular import
 
 
 class XHMMDecoder:
@@ -23,7 +23,7 @@ class XHMMDecoder:
         self.use_7 = use_7
         self.use_extended = use_extended
         self.log_input = log_input
-        template_source = Path(template_file) if template_file is not None else get_resource_path("data", "full_chord_list.txt")
+        template_source = Path(template_file) if template_file is not None else Path(__file__).parent.parent / "data" / "full_chord_list.txt"
         self.__init_known_chord_names(str(template_source))
 
     def __init_known_chord_names(self, template_file):

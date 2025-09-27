@@ -9,7 +9,7 @@ import numpy as np
 from .complex_chord import Chord,ChordTypeLimit,shift_complex_chord_array_list,complex_chord_chop,enum_to_dict,\
     TriadTypes,SeventhTypes,NinthTypes,EleventhTypes,ThirteenthTypes,complex_chord_chop_list
 from .train_eval_test_split import get_train_set_ids,get_test_set_ids,get_val_set_ids
-from . import get_resource_path
+from pathlib import Path
 
 SHIFT_LOW=-5
 SHIFT_HIGH=6
@@ -276,7 +276,8 @@ if __name__ == '__main__':
     song_count=storage_x.total_song_count
     if(0<=slice_id and slice_id<=5):
         print('Train on slice %d'%slice_id)
-        with open(get_resource_path('data', f'cross_subpart_weight{slice_id}.pkl'), 'rb') as f:
+        weight_path = Path(__file__).parent / 'data' / f'cross_subpart_weight{slice_id}.pkl'
+        with open(weight_path, 'rb') as f:
             cross_subpart_counter=pickle.load(f)
         train_indices=get_train_set_ids(slice_id)
         val_indices=get_val_set_ids(slice_id)
@@ -284,7 +285,8 @@ if __name__ == '__main__':
         train_indices=np.arange(song_count)
         val_indices=np.arange(0,1) # fake validation here
         # todo: weight calculation for full dataset
-        with open(get_resource_path('data', f'cross_subpart_weight{0}.pkl'), 'rb') as f:
+        weight_path = Path(__file__).parent / 'data' / f'cross_subpart_weight{0}.pkl'
+        with open(weight_path, 'rb') as f:
             cross_subpart_counter=pickle.load(f)
     train_provider=FramedDataProvider(train_sample_length=LSTM_TRAIN_LENGTH,shift_low=SHIFT_LOW,shift_high=SHIFT_HIGH,num_workers=1,average_samples_per_song=1)
     train_provider.link(storage_x,CQTPitchShifter(SPEC_DIM,SHIFT_LOW,SHIFT_HIGH),subrange=train_indices)

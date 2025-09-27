@@ -1,6 +1,6 @@
 from abc import ABC,abstractmethod
 from ..common import WORKING_PATH
-from . import io
+from .. import io
 import os
 import pickle
 

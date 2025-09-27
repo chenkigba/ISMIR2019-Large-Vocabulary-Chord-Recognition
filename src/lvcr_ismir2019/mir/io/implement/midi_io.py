@@ -1,4 +1,4 @@
-from .io.feature_io_base import *
+from ..feature_io_base import *
 import pretty_midi
 
 class MidiIO(FeatureIO):

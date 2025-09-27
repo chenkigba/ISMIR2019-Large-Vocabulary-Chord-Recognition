@@ -7,7 +7,7 @@ name = "lvcr-ismir2019"          # ✅ 连字符（项目名）
 version = "1.0.0"
 description = "Large Vocabulary Chord Recognition"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.8,<3.12"
 dependencies = [
     "numpy>=1.20",
     "librosa>=0.9",

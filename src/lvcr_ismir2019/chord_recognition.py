@@ -6,7 +6,7 @@ from .extractors.xhmm_ismir import XHMMDecoder
 import numpy as np
 from .io_new.chordlab_io import ChordLabIO
 from .settings import DEFAULT_SR, DEFAULT_HOP_LENGTH
-from . import get_resource_path
+from pathlib import Path
 import sys
 import os
 import torch
@@ -19,7 +19,7 @@ MODEL_NAMES = [
 def chord_recognition(audio_path, lab_path, chord_dict_name="submission"):
     # Use log-prob decoding; disable caching (one-off processing)
     hmm = XHMMDecoder(
-        template_file=str(get_resource_path("data", f"{chord_dict_name}_chord_list.txt")), log_input=True
+        template_file=str(Path(__file__).parent / "data" / f"{chord_dict_name}_chord_list.txt"), log_input=True
     )
     # Empty name disables all extractors' cache
     entry = DataEntry()
