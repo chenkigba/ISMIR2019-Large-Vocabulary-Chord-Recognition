@@ -1,6 +1,6 @@
-from .chordnet_ismir_naive import ChordNet, chord_limit, ChordNetCNN
+from .chordnet_ismir_naive import ChordNet
 from .mir.nn.train import NetworkInterface
-from .extractors.cqt import CQTV2, SimpleChordToID
+from .extractors.cqt import CQTV2
 from .mir import io, DataEntry
 from .extractors.xhmm_ismir import XHMMDecoder
 import numpy as np
@@ -8,7 +8,6 @@ from .io_new.chordlab_io import ChordLabIO
 from .settings import DEFAULT_SR, DEFAULT_HOP_LENGTH
 from pathlib import Path
 import sys
-import os
 import torch
 
 MODEL_NAMES = [

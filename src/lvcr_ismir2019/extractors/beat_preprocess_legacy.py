@@ -1,11 +1,9 @@
-from . import datasets
 from ..io_new.beatlab_io import BeatLabIO
 import numpy as np
 from ..mir.extractors import ExtractorBase
 from ..io_new.beat_align_io import BeatAlignCQTIO
 from ..io_new.chordlab_io import ChordLabIO
 from ..io_new.list_io import ListIO
-from ..mir import io
 import librosa
 from ..mir.chord import Chord,ChordTypeComplexity
 EPS=1e-8

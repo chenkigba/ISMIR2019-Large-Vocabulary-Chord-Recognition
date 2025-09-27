@@ -1,6 +1,5 @@
 from ..feature_io_base import *
 from ...common import PACKAGE_PATH
-import numpy as np
 
 class SpectrogramIO(FeatureIO):
     def read(self, filename, entry):

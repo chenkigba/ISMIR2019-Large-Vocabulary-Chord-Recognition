@@ -1,6 +1,3 @@
-from ..mir.extractors import ExtractorBase
-from ..mir import io
-from ..io_new.complex_chord_io import ComplexChordIO
 import numpy as np
 from . import complex_chord
 from ..mir.music_base import get_scale_and_suffix

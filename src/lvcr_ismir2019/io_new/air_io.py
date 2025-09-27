@@ -1,6 +1,4 @@
 from ..mir.io.feature_io_base import *
-import numpy as np
-import librosa
 
 class AirIO(FeatureIO):
     def read(self, filename, entry):

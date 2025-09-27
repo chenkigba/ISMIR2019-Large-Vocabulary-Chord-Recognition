@@ -1,12 +1,8 @@
 from . import datasets
-from .mir.nn.data_storage import FramedRAMDataStorage,FramedH5DataStorage
+from .mir.nn.data_storage import FramedH5DataStorage
 import numpy as np
-from . import datasets
 from .extractors.cqt import CQTV2
 from .mir.extractors.misc import FrameCount
-from .extractors.key_preprocess import FramedKey
-from .extractors.beat_preprocess import SimpleFramedDownbeatAnnotation,BasicStructureAnnotationFromBillboard
-from .mir import io
 
 def create_jams_storage():
     jam=datasets.create_jam_dataset()

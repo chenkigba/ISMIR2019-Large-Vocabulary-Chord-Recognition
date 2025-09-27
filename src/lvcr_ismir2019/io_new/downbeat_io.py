@@ -1,7 +1,6 @@
 from ..mir.io.feature_io_base import *
 from ..mir.common import PACKAGE_PATH
 import numpy as np
-import librosa
 
 class DownbeatIO(FeatureIO):
     def read(self, filename, entry):

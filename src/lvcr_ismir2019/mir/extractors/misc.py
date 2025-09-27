@@ -1,5 +1,4 @@
 from .extractor_base import *
-import librosa
 import numpy as np
 
 class BlankMusic(ExtractorBase):

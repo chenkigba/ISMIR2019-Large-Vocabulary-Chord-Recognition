@@ -1,5 +1,5 @@
 import os
-from .mir import DataPool,DataEntry,io
+from .mir import DataPool,io
 from .io_new.jams_io import JamsIO
 from .io_new.chordlab_io import ChordLabIO
 from .io_new.beatlab_io import BeatLabIO
@@ -244,11 +244,8 @@ if __name__ == '__main__':
     from .extractors.beat_analysis import analyze_double_speed_error
     cb=create_valid_cb_dataset()
     from .extractors.cqt import CQTV2
-    from .extractors.key_preprocess import FramedKey
-    from .mir.extractors.misc import FrameCount
     from .extractors.madmom_extractor import DBNDownBeatExtractor,DBNDownBeatProbability
-    from .extractors.beat_preprocess import BeatAnnotationFromBillboard,TonicAnnotationFromBillboard,BasicStructureAnnotationFromBillboard
-    from .extractors.complex_chord_preprocess import chordlab_to_flat_vocab,get_flat_chord_vocab
+    from .extractors.complex_chord_preprocess import get_flat_chord_vocab
     from .mir.extractors.librosa_extractor import HPSS
     chord_dict=get_flat_chord_vocab(str(get_resource_path('data', 'submission_chord_list.txt')))
 

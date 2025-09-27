@@ -1,17 +1,7 @@
-from .mir.nn.train import NetworkInterface
-from . import datasets
-from .extractors.cqt import CQTV2,SimpleChordToID
-from .mir import io,DataEntry
-from .io_new.chordlab_io import ChordLabIO
-from .extractors.xhmm_decoder import XHMMDecoder,prob_to_spectrogram
 from . import get_resource_path
-from .complex_chord import Chord,ChordTypeLimit,shift_complex_chord_array_list,complex_chord_chop,enum_to_dict,\
-    TriadTypes,SeventhTypes,NinthTypes,EleventhTypes,ThirteenthTypes
-from .mir.music_base import NUM_TO_ABS_SCALE
 import os
 import mir_eval
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
 
 class ExperimentTest():
@@ -186,7 +176,7 @@ def extract_quality_list_from_file(filename):
 
 def main():
     
-    from .settings import JAM_DATASET_PATH,MY_DATASET_PATH
+    from .settings import JAM_DATASET_PATH
     ExperimentTest.ET_confusion_chord=extract_quality_list_from_file(str(get_resource_path('data', 'submission_chord_list.txt')))
     #q = ExperimentTest(True,os.path.join(JAM_DATASET_PATH,'chordlab')+'/',"output/output_joint_chord_net_ismir_flat_v1.0_reweight(1.0,1.0)_s%d.best_hmm_submission/jam/")
     q = ExperimentTest(True,os.path.join(JAM_DATASET_PATH,'chordlab')+'/',"output/output_joint_chord_net_ismir_v1.0_triad_only_reweight(1.0,1.0)_s%d.best_hmm_ismir2017/jam/")
