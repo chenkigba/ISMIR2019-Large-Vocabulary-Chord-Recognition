@@ -1,0 +1,24 @@
+# Include the README and license files
+include README.MD
+include LICENSE
+include requirements.txt
+
+# Include all data files
+recursive-include data *.txt *.csv *.lab *.n3 *.svl *.pkl *.xlsx
+
+# Include pretrained models
+recursive-include cache_data *.sdict
+
+# Include any additional configuration files
+include settings.py
+
+# Exclude unnecessary files
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *~
+global-exclude __pycache__
+recursive-exclude * __pycache__
+recursive-exclude * *.py[co]
+
+# Exclude spike directory (experimental code)
+prune spike
