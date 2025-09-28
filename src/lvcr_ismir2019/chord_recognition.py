@@ -76,13 +76,17 @@ class StageTimer:
         print(f"[time] Total{'':<18} {total_time:6.3f}s")
 
 
-def chord_recognition(audio_path, lab_path, chord_dict_name="submission", verbose=False):
+def chord_recognition(
+    audio_path, lab_path, chord_dict_name="submission", verbose=False
+):
     # Use log-prob decoding; disable caching (one-off processing)
     timer = StageTimer(enabled=verbose)
 
     with timer.stage("Init HMM"):
         hmm = XHMMDecoder(
-            template_file=str(Path(__file__).parent / "data" / f"{chord_dict_name}_chord_list.txt"),
+            template_file=str(
+                Path(__file__).parent / "data" / f"{chord_dict_name}_chord_list.txt"
+            ),
             log_input=True,
         )
     # Empty name disables all extractors' cache
@@ -94,7 +98,11 @@ def chord_recognition(audio_path, lab_path, chord_dict_name="submission", verbos
         # Explicitly disable cache for this extractor call
         entry.append_extractor(CQTV2, "cqt", cache_enabled=False)
 
-    # Prepare input tensor once and reuse across ensemble models
+    # 先单独计时音频加载（解码）；随后再计时CQT计算
+    with timer.stage("Load audio"):
+        _ = entry.music
+
+    # 计算CQT（混合CQT），与音频加载分开计时，便于定位瓶颈
     with timer.stage("Compute CQT"):
         cqt_np = entry.cqt  # triggers extraction (cached if available)
 
@@ -103,6 +111,7 @@ def chord_recognition(audio_path, lab_path, chord_dict_name="submission", verbos
         x_input = torch.tensor(cqt_np, dtype=torch.float32, device=device)
 
     probs = []
+
     # Function to sync CUDA for accurate timing, no-op on CPU
     def _sync_cuda():
         if device.type == "cuda":
@@ -160,7 +169,9 @@ def main():
     )
     args = parser.parse_args(sys.argv[1:])
 
-    chord_recognition(args.audio_path, args.lab_path, args.chord_dict, verbose=args.verbose)
+    chord_recognition(
+        args.audio_path, args.lab_path, args.chord_dict, verbose=args.verbose
+    )
 
 
 if __name__ == "__main__":
