@@ -144,6 +144,9 @@ def chord_recognition(
         chordlab = hmm.decode_to_chordlab(entry, probs, False)
     with timer.stage("Save output"):
         entry.append_data(chordlab, ChordLabIO, "chord")
+        entry.save("chord", lab_path)
+
+    timer.print_summary()
 
 
 def chord_recognition_from_memory(audio, sr, lab_path, chord_dict_name="submission", verbose=False, name="in-memory"):
