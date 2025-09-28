@@ -6,7 +6,7 @@ build-backend = "hatchling.build"
 name = "lvcr-ismir2019"          # ✅ 连字符（项目名）
 version = "1.0.0"
 description = "Large Vocabulary Chord Recognition"
-requires-python = "==3.11.9"
+requires-python = ">3.11.0"
 dependencies = [
     "numpy>=1.20",
     "librosa>=0.9",
