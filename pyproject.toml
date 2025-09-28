@@ -6,13 +6,15 @@ build-backend = "hatchling.build"
 name = "lvcr-ismir2019"          # ✅ 连字符（项目名）
 version = "1.0.0"
 description = "Large Vocabulary Chord Recognition"
-requires-python = ">=3.8,<3.12"
+requires-python = "==3.11.9"
 dependencies = [
     "numpy>=1.20",
     "librosa>=0.9",
     "pydub>=0.25.1",
     "pretty-midi",
     "h5py>=3.11.0",
+    "torch>=2.8.0",
+    "torchvision>=0.22.0",
 ]
 
 [project.optional-dependencies]
@@ -27,10 +29,10 @@ packages = ["src/lvcr_ismir2019"]  # ✅ 指定包位置
 [tool.uv.sources]
 pretty-midi = { git = "https://github.com/chenkigba/pretty-midi.git" }
 torch = [
-  { index = "pytorch-cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+  { index = "pytorch-cu128"},
 ]
 torchvision = [
-  { index = "pytorch-cu128", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+  { index = "pytorch-cu128"},
 ]
 
 [[tool.uv.index]]
