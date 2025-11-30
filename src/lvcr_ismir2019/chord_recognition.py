@@ -12,6 +12,55 @@ import time
 import argparse
 import torch
 import librosa
+from scipy.ndimage import gaussian_filter1d
+
+
+def frame_energy_equalization(cqt, smooth_sigma=5, min_gain=0.1, max_gain=10.0):
+    """
+    帧级能量均衡化：让每一帧的能量都趋于统一。
+    
+    解决的问题：当音频中存在动态范围较大的段落（如安静的吉他独奏 vs 全乐队段落）时，
+    模型的 InstanceNorm + LSTM 会以高能量段落为参照，导致低能量段落被误识别为"无和弦"。
+    
+    参数:
+        cqt: numpy.ndarray, shape (n_frames, n_bins), CQT 特征
+        smooth_sigma: float, 高斯平滑的标准差，用于平滑增益曲线，避免帧间突变
+        min_gain: float, 最小增益（防止过度衰减）
+        max_gain: float, 最大增益（防止噪声放大）
+    
+    返回:
+        numpy.ndarray, 均衡化后的 CQT 特征
+    """
+    # 计算每帧的总能量
+    frame_energy = np.sum(cqt, axis=1)
+    
+    # 计算目标能量：使用非静音帧的中位数（比均值更鲁棒）
+    non_silent_threshold = np.percentile(frame_energy, 10)
+    non_silent_mask = frame_energy > non_silent_threshold
+    
+    if not np.any(non_silent_mask):
+        return cqt  # 全是静音，不处理
+    
+    target_energy = np.median(frame_energy[non_silent_mask])
+    
+    if target_energy <= 0:
+        return cqt
+    
+    # 计算每帧需要的增益（可以 > 1 提升，也可以 < 1 衰减）
+    epsilon = 1e-6
+    gain = target_energy / (frame_energy + epsilon)
+    
+    # 限制增益范围
+    gain = np.clip(gain, min_gain, max_gain)
+    
+    # 平滑增益曲线，避免帧间突变
+    if smooth_sigma > 0:
+        gain = gaussian_filter1d(gain, sigma=smooth_sigma)
+    
+    # 应用增益
+    cqt_equalized = cqt * gain[:, np.newaxis]
+    
+    return cqt_equalized.astype(np.float32)
 
 
 MODEL_NAMES = [
@@ -108,6 +157,10 @@ def chord_recognition(
     with timer.stage("Compute CQT"):
         cqt_np = entry.cqt  # triggers extraction (cached if available)
 
+    # 帧级能量均衡化：解决动态范围过大导致的低能量段落识别失败问题
+    with timer.stage("Energy equalization"):
+        cqt_np = frame_energy_equalization(cqt_np)
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with timer.stage("Prepare tensor"):
         x_input = torch.tensor(cqt_np, dtype=torch.float32, device=device)
@@ -202,6 +255,10 @@ def chord_recognition_from_memory(audio, sr, lab_path, chord_dict_name="submissi
 
     with timer.stage("Compute CQT"):
         cqt_np = entry.cqt
+
+    # 帧级能量均衡化：解决动态范围过大导致的低能量段落识别失败问题
+    with timer.stage("Energy equalization"):
+        cqt_np = frame_energy_equalization(cqt_np)
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     with timer.stage("Prepare tensor"):
