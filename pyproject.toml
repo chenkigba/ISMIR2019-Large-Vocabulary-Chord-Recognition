@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "lvcr-ismir2019"          # ✅ 连字符（项目名）
-version = "1.0.0"
+version = "1.0.1"
 description = "Large Vocabulary Chord Recognition"
 requires-python = ">3.11.0"
 dependencies = [
@@ -15,6 +15,7 @@ dependencies = [
     "h5py>=3.11.0",
     "torch>=2.8.0",
     "torchvision>=0.22.0",
+    "matplotlib>=3.10.7",
 ]
 
 [project.optional-dependencies]
