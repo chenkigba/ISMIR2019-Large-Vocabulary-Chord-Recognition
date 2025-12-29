@@ -10,6 +10,11 @@ requires-python = ">3.11.0"
 dependencies = [
     "numpy>=1.20",
     "librosa>=0.9",
+    # NOTE: On Python 3.11, unconstrained resolution may select old `numba/llvmlite`
+    # versions that build but fail at install-time (e.g., llvmlite==0.36.*).
+    # Explicitly requiring a modern numba prevents that and lets the resolver pick a
+    # compatible numpy/llvmlite set.
+    "numba>=0.57",
     "pydub>=0.25.1",
     "pretty-midi",
     "h5py>=3.11.0",
