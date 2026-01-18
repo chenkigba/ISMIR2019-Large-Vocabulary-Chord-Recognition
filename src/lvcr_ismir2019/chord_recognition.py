@@ -127,11 +127,52 @@ class StageTimer:
         print(f"[time] Total{'':<18} {total_time:6.3f}s")
 
 
+def _prepare_beat_info(beats, downbeats):
+    """
+    Convert beats and downbeats arrays to the format expected by XHMMDecoder.
+
+    Args:
+        beats: numpy array of beat times in seconds
+        downbeats: numpy array of downbeat times in seconds
+
+    Returns:
+        List of (time, beat_number) tuples where beat_number is 1 for downbeats
+    """
+    if beats is None or len(beats) == 0:
+        return None
+
+    beats = np.asarray(beats)
+    downbeats = np.asarray(downbeats) if downbeats is not None else np.array([])
+
+    # Create a set of downbeat times for fast lookup
+    downbeat_set = set(downbeats.tolist()) if len(downbeats) > 0 else set()
+
+    # Assign beat numbers: 1 for downbeat, incrementing within each bar
+    beat_info = []
+    beat_in_bar = 1
+
+    for t in beats:
+        # Check if this beat is a downbeat (with small tolerance)
+        is_downbeat = any(abs(t - d) < 0.02 for d in downbeat_set)
+        if is_downbeat:
+            beat_in_bar = 1
+        beat_info.append((float(t), beat_in_bar))
+        beat_in_bar += 1
+
+    return beat_info
+
+
 def chord_recognition(
-    audio_path, lab_path, chord_dict_name="submission", verbose=False
+    audio_path, lab_path, chord_dict_name="submission", verbose=False,
+    beats=None, downbeats=None
 ):
     # Use log-prob decoding; disable caching (one-off processing)
     timer = StageTimer(enabled=verbose)
+
+    # Prepare beat information if provided
+    use_beats = beats is not None and len(beats) > 0
+    use_downbeats = use_beats and downbeats is not None and len(downbeats) > 0
+    beat_info = _prepare_beat_info(beats, downbeats) if use_beats else None
 
     with timer.stage("Init HMM"):
         hmm = XHMMDecoder(
@@ -148,6 +189,10 @@ def chord_recognition(
         entry.append_file(audio_path, io.MusicIO, "music")
         # Explicitly disable cache for this extractor call
         entry.append_extractor(CQTV2, "cqt", cache_enabled=False)
+
+        # Attach beat information to entry if provided
+        if beat_info is not None:
+            entry.beat = beat_info
 
     # 先单独计时音频加载（解码）；随后再计时CQT计算
     with timer.stage("Load audio"):
@@ -194,7 +239,10 @@ def chord_recognition(
     with timer.stage("Ensemble log-mean-exp"):
         probs = [log_mean_exp(h, axis=0) for h in log_probs]
     with timer.stage("HMM decode"):
-        chordlab = hmm.decode_to_chordlab(entry, probs, False)
+        chordlab = hmm.decode_to_chordlab(
+            entry, probs, False,
+            use_beats=use_beats, use_downbeats=use_downbeats
+        )
     with timer.stage("Save output"):
         entry.append_data(chordlab, ChordLabIO, "chord")
         entry.save("chord", lab_path)
@@ -202,7 +250,8 @@ def chord_recognition(
     timer.print_summary()
 
 
-def chord_recognition_from_memory(audio, sr, lab_path, chord_dict_name="submission", verbose=False, name="in-memory"):
+def chord_recognition_from_memory(audio, sr, lab_path, chord_dict_name="submission", verbose=False, name="in-memory",
+                                   beats=None, downbeats=None):
     """基于内存中的音频数据运行和弦识别并保存到 .lab 文件。
 
     参数:
@@ -212,8 +261,15 @@ def chord_recognition_from_memory(audio, sr, lab_path, chord_dict_name="submissi
     - chord_dict_name: 和弦词典，默认 submission
     - verbose: 是否打印阶段耗时
     - name: 可选的音频标识名（用于日志）
+    - beats: numpy.ndarray, 节拍时间点（秒），可选
+    - downbeats: numpy.ndarray, 重拍时间点（秒），可选
     """
     timer = StageTimer(enabled=verbose)
+
+    # Prepare beat information if provided
+    use_beats = beats is not None and len(beats) > 0
+    use_downbeats = use_beats and downbeats is not None and len(downbeats) > 0
+    beat_info = _prepare_beat_info(beats, downbeats) if use_beats else None
 
     # 预处理：转单声道、类型与重采样
     with timer.stage("Prepare audio"):
@@ -248,6 +304,10 @@ def chord_recognition_from_memory(audio, sr, lab_path, chord_dict_name="submissi
         # 直接注入内存中的波形
         entry.append_data(y, io.MusicIO, "music")
         entry.append_extractor(CQTV2, "cqt", cache_enabled=False)
+
+        # Attach beat information to entry if provided
+        if beat_info is not None:
+            entry.beat = beat_info
 
     # 访问一次触发潜在的惰性流程（对 DataProxy 为 O(1)）
     with timer.stage("Load audio"):
@@ -288,7 +348,10 @@ def chord_recognition_from_memory(audio, sr, lab_path, chord_dict_name="submissi
     with timer.stage("Ensemble log-mean-exp"):
         probs = [log_mean_exp(h, axis=0) for h in log_probs]
     with timer.stage("HMM decode"):
-        chordlab = hmm.decode_to_chordlab(entry, probs, False)
+        chordlab = hmm.decode_to_chordlab(
+            entry, probs, False,
+            use_beats=use_beats, use_downbeats=use_downbeats
+        )
     with timer.stage("Save output"):
         entry.append_data(chordlab, ChordLabIO, "chord")
         entry.save("chord", lab_path)

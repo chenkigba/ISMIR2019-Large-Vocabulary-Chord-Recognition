@@ -32,6 +32,62 @@ Here, ``chord_dict`` is an optional parameter that tells the HMM which chord dic
 
 You may also manually adjust the chord dictionary by editing them in the folder ``data/*_chord_list.txt``.
 
+## Beat-Guided Chord Recognition
+
+You can improve chord boundary alignment by providing beat information to the HMM decoder. This feature constrains chord transitions to occur at beat positions, which better reflects how music is structured.
+
+### Python API
+
+```python
+from lvcr_ismir2019.chord_recognition import chord_recognition
+
+# Without beat guidance (original behavior)
+chord_recognition(audio_path, output_path, chord_dict="submission")
+
+# With beat guidance (new feature)
+import numpy as np
+beats = np.array([0.5, 1.0, 1.5, 2.0, ...])      # beat times in seconds
+downbeats = np.array([0.5, 2.5, 4.5, ...])       # downbeat times in seconds
+
+chord_recognition(
+    audio_path, output_path, chord_dict="submission",
+    beats=beats, downbeats=downbeats
+)
+```
+
+### How It Works
+
+When beat information is provided:
+1. The HMM decoder restricts chord transitions to occur only at beat positions
+2. Downbeats (beat 1 of each bar) have the lowest transition penalty, making chord changes most likely there
+3. Other beats have moderate transition penalties
+4. Between beats, chord transitions are not allowed
+
+This results in chord boundaries that align with the musical meter, which is desirable for applications like automatic accompaniment and music analysis.
+
+### Integration with beat_this
+
+You can use [beat_this](https://github.com/CPJKU/beat_this) to extract beats automatically:
+
+```python
+from beat_this.inference import Audio2Beats
+from lvcr_ismir2019.chord_recognition import chord_recognition
+import librosa
+
+# Load audio
+audio, sr = librosa.load("song.wav", sr=None)
+
+# Extract beats
+audio2beats = Audio2Beats(device="cuda", dbn=True)
+beats, downbeats = audio2beats(audio, sr)
+
+# Extract chords with beat guidance
+chord_recognition(
+    "song.wav", "chords.lab",
+    beats=beats, downbeats=downbeats
+)
+```
+
 ## Training
 
 First prepare the jams dataset in the following format:
